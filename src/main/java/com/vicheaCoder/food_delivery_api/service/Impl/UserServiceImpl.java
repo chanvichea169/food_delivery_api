@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static com.vicheaCoder.food_delivery_api.utils.DateTimeUtils.convertStringToDate;
+
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
@@ -85,15 +87,13 @@ public class UserServiceImpl implements UserService {
                 StringUtils.hasText(userRequest.getUserType()) ? userRequest.getUserType().toUpperCase() : "CUSTOMER"));
         user.setAddress(userRequest.getAddress());
         user.setStatus(userRequest.getStatus());
-        user.setDateOfBirth(userHandlerService.convertStringToDate(userRequest.getDateOfBirth()));
+        user.setDateOfBirth(convertStringToDate(userRequest.getDateOfBirth()));
         user.setUpdatedAt(new Date());
         user.setUpdatedBy("SYSTEM");
 
-        // Save updated user
         User updatedUser = userRepository.save(user);
         log.info("Updated user with ID: {}", id);
 
-        // Handle device update or insertion
         DeviceRequest deviceRequest = userRequest.getDeviceRequest();
         if (deviceRequest != null && StringUtils.hasText(deviceRequest.getDeviceId())) {
             Device existingDevice = user.getDevices().stream()
@@ -109,6 +109,11 @@ public class UserServiceImpl implements UserService {
                 existingDevice.setLastLogin(deviceRequest.getLastLogin());
                 existingDevice.setTrustDevice(deviceRequest.isTrustDevice());
                 existingDevice.setStatus(deviceRequest.getStatus());
+                existingDevice.setUser(updatedUser);
+                existingDevice.setUpdatedAt(new Date());
+                existingDevice.setUpdatedBy("SYSTEM");
+                existingDevice.setCreatedBy(existingDevice.getCreatedBy());
+                existingDevice.setCreatedAt(existingDevice.getCreatedAt());
 
                 try {
                     deviceRepository.save(existingDevice);

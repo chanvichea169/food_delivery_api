@@ -5,6 +5,7 @@ import com.vicheaCoder.food_delivery_api.dto.UserResponse;
 import com.vicheaCoder.food_delivery_api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -45,17 +46,23 @@ public class UserRestController {
     }
 
     @GetMapping(produces = "application/json")
-    public ResponseEntity<List<UserResponse>> getAll() {
-        List<UserResponse> users = userService.findAll();
-        if (users.isEmpty()) {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<?> getAll() {
+        try {
+            List<UserResponse> users = userService.findAll();
+            return ResponseEntity.ok(users);
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-        return ResponseEntity.ok(users);
+
     }
 
-    @DeleteMapping(value = "/delete/{id}", produces = "application/json")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.ok("User with ID " + id + " deleted successfully.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 }

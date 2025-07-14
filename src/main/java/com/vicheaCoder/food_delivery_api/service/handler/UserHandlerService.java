@@ -15,7 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.vicheaCoder.food_delivery_api.Constant.*;
+import static com.vicheaCoder.food_delivery_api.constant.Constant.*;
+import static com.vicheaCoder.food_delivery_api.utils.DateTimeUtils.convertStringToDate;
 
 @Service
 @Slf4j
@@ -54,15 +55,6 @@ public class UserHandlerService {
         if (!email.matches("^[\\w-.]+@[\\w-]+\\.[a-zA-Z]{2,}$")) {
             log.error("Email format is invalid: {}", email);
             throw new IllegalArgumentException("Invalid email format");
-        }
-    }
-
-    public Date convertStringToDate(String dateString) {
-        try {
-            return new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).parse(dateString);
-        } catch (ParseException e) {
-            log.error("Error parsing date: {}", dateString, e);
-            throw new IllegalArgumentException("Invalid date format, expected yyyy-MM-dd");
         }
     }
 

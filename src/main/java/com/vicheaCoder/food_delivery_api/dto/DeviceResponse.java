@@ -30,5 +30,4 @@ public class DeviceResponse {
     private boolean trustDevice;
     @JsonProperty("status")
     private String status;
-
 }
