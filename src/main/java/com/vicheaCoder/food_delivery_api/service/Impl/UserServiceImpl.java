@@ -4,12 +4,13 @@ import com.vicheaCoder.food_delivery_api.dto.DeviceRequest;
 import com.vicheaCoder.food_delivery_api.dto.UserRequest;
 import com.vicheaCoder.food_delivery_api.dto.UserResponse;
 import com.vicheaCoder.food_delivery_api.enumeration.UserType;
+import com.vicheaCoder.food_delivery_api.exception.ResourceNotFoundException;
 import com.vicheaCoder.food_delivery_api.model.Device;
 import com.vicheaCoder.food_delivery_api.model.User;
 import com.vicheaCoder.food_delivery_api.respository.DeviceRepository;
 import com.vicheaCoder.food_delivery_api.respository.UserRepository;
-import com.vicheaCoder.food_delivery_api.service.handler.UserHandlerService;
 import com.vicheaCoder.food_delivery_api.service.UserService;
+import com.vicheaCoder.food_delivery_api.service.handler.UserHandlerService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -144,7 +145,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             log.error("User with ID {} not found", id);
-            throw new RuntimeException("User with ID " + id + " not found");
+            throw new ResourceNotFoundException("User with ID " + id + " not found");
         }
         log.info("Fetching user with ID: {}", id);
         return userHandlerService.convertToUserResponse(user.get());

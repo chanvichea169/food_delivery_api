@@ -27,4 +27,5 @@ public class RestaurantRequest extends BaseEntity {
     @Temporal(TemporalType.TIME)
     @JsonProperty("close_time")
     private String closeTime;
+
 }

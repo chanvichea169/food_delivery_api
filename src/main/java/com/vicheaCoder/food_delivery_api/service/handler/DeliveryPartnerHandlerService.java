@@ -36,8 +36,10 @@ public class DeliveryPartnerHandlerService {
         ));
         deliveryPartner.setAvailable(deliveryPartnerRequest.isAvailable());
         deliveryPartner.setDateOfBirth(convertStringToDate(deliveryPartnerRequest.getDateOfBirth()));
-        deliveryPartner.setCreatedAt(new Date());
-        deliveryPartner.setCreatedBy(Constant.SYSTEM_USER);
+        if(deliveryPartner.getId() == null){
+            deliveryPartner.setCreatedAt(new Date());
+            deliveryPartner.setCreatedBy(Constant.SYSTEM_USER);
+        }
 
         return deliveryPartner;
     }

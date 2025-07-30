@@ -1,17 +1,17 @@
 package com.vicheaCoder.food_delivery_api.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.vicheaCoder.food_delivery_api.model.BaseEntity;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+
+import java.util.Date;
 
 @Getter
 @Setter
 @ToString
-public class RestaurantResponse extends BaseEntity {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class RestaurantResponse {
 
     private Long id;
     private String code;
@@ -21,16 +21,25 @@ public class RestaurantResponse extends BaseEntity {
     private double rating;
     private String address;
     private String phoneNumber;
+
     @JsonProperty("logo_url")
     private String logUrl;
-    @Temporal(TemporalType.TIME)
+
     @JsonProperty("open_time")
     private String openTime;
-    @Temporal(TemporalType.TIME)
+
     @JsonProperty("close_time")
     private String closeTime;
+
     @JsonProperty("created_at")
-    private String createAt;
-    @JsonProperty("create_by")
-    private String createBy;
+    private Date createdAt;
+
+    @JsonProperty("created_by")
+    private String createdBy;
+
+    @JsonProperty("updated_at")
+    private Date updatedAt;
+
+    @JsonProperty("updated_by")
+    private String updatedBy;
 }

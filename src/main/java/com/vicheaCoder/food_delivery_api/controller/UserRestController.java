@@ -23,46 +23,45 @@ public class UserRestController {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors());
         }
-
         UserResponse createdUser = userService.createUser(userRequest);
-        return ResponseEntity.ok(createdUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @PutMapping(value = "/update/{id}", produces = "application/json")
-    public ResponseEntity<UserResponse> update(
-            @PathVariable Long id,
-            @RequestBody UserRequest userRequest) {
-        UserResponse updatedUser = userService.updateUser(id, userRequest);
-        return ResponseEntity.ok(updatedUser);
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody UserRequest userRequest) {
+        try {
+            UserResponse updatedUser = userService.updateUser(id, userRequest);
+            return ResponseEntity.ok(updatedUser);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + id + " not found.");
+        }
     }
 
     @GetMapping(value = "/{id}", produces = "application/json")
-    public ResponseEntity<UserResponse> getById(@PathVariable Long id) {
+    public ResponseEntity<?> getById(@PathVariable Long id) {
         UserResponse userResponse = userService.getUserById(id);
         if (userResponse == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + id + " not found.");
         }
         return ResponseEntity.ok(userResponse);
     }
 
     @GetMapping(produces = "application/json")
     public ResponseEntity<?> getAll() {
-        try {
-            List<UserResponse> users = userService.findAll();
-            return ResponseEntity.ok(users);
-        }catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        List<UserResponse> users = userService.findAll();
+        if (users.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No users found.");
         }
-
+        return ResponseEntity.ok(users);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
             userService.deleteUser(id);
             return ResponseEntity.ok("User with ID " + id + " deleted successfully.");
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + id + " not found.");
         }
     }
 }

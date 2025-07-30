@@ -6,6 +6,7 @@ import com.vicheaCoder.food_delivery_api.dto.RestaurantResponse;
 import java.util.List;
 
 public interface RestaurantService {
+
     RestaurantResponse create(RestaurantRequest restaurantRequest);
     RestaurantResponse update(Long id, RestaurantRequest restaurantRequest);
     void delete(Long id);
