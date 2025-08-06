@@ -99,4 +99,14 @@ public class MenuItemServiceImpl implements MenuItemService {
                 .map(menuItemServiceHandler::convertMenuItemToMenuItemResponse)
                 .toList();
     }
+
+    @Override
+    public List<MenuItemResponse> getAllMenuItems() {
+        List<MenuItem> menuItems = menuItemRepository.findAll();
+        log.info("Found {} menu items in total", menuItems.size());
+
+        return menuItems.stream()
+                .map(menuItemServiceHandler::convertMenuItemToMenuItemResponse)
+                .toList();
+    }
 }
