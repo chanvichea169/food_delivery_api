@@ -25,16 +25,16 @@ public class MenuItemServiceImpl implements MenuItemService {
     private final MenuItemServiceHandler menuItemServiceHandler;
 
     @Override
-    public MenuItemResponse createMenuItem(MenuItemRequest request) {
-        Optional<Restaurant> restaurantOpt = restaurantRepository.findById(request.getRestaurantId());
+    public MenuItemResponse createMenuItem(MenuItemRequest menuItemRequest) {
+        Optional<Restaurant> restaurantOpt = restaurantRepository.findById(menuItemRequest.getRestaurantId());
 
         if (restaurantOpt.isEmpty()) {
-            log.error("Restaurant with id {} not found", request.getRestaurantId());
+            log.error("Restaurant with id {} not found", menuItemRequest.getRestaurantId());
             return new MenuItemResponse();
         }
 
         Restaurant restaurant = restaurantOpt.get();
-        MenuItem menuItem = menuItemServiceHandler.convertMenuItemRequestToMenuItem(request, new MenuItem(), restaurant);
+        MenuItem menuItem = menuItemServiceHandler.convertMenuItemRequestToMenuItem(menuItemRequest, new MenuItem(), restaurant);
 
         log.info("Creating menu item: {}", menuItem);
         menuItem = menuItemRepository.save(menuItem);

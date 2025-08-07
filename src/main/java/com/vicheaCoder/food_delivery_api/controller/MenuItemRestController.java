@@ -2,10 +2,7 @@ package com.vicheaCoder.food_delivery_api.controller;
 
 import com.vicheaCoder.food_delivery_api.dto.MenuItemRequest;
 import com.vicheaCoder.food_delivery_api.dto.MenuItemResponse;
-import com.vicheaCoder.food_delivery_api.dto.RestaurantRequest;
-import com.vicheaCoder.food_delivery_api.dto.RestaurantResponse;
 import com.vicheaCoder.food_delivery_api.service.MenuItemService;
-import com.vicheaCoder.food_delivery_api.service.RestaurantService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
