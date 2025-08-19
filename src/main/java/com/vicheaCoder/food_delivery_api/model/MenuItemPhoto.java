@@ -18,6 +18,7 @@ public class MenuItemPhoto extends BaseEntity{
     private String fileType;
     private String fileFormat;
     private String fileSize;
+    private String fileName;
     private String smallUrl;
     private String mediumUrl;
     private String largeUrl;

@@ -9,7 +9,6 @@ import lombok.ToString;
 @Setter
 @ToString
 public class MenuItemRequest {
-
     private String code;
     private String name;
     private String description;

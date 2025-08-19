@@ -9,18 +9,33 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tbl-menu_item")
-public class MenuItem extends BaseEntity{
+@Table(
+        name = "tbl_menu_item",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"code"}),
+        }
+)
+public class MenuItem extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
+    @Column(nullable = false, unique = true)
     private String code;
-    private String name;
-    private String description;
-    private double price;
-    private Integer availability;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Restaurant restaurant;
 
+    @Column(nullable = false)
+    private String name;
+
+    private String description;
+
+    @Column(nullable = false)
+    private double price;
+
+    @Column(nullable = false)
+    private Integer availability;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurant_id", nullable = false)
+    private Restaurant restaurant;
 }

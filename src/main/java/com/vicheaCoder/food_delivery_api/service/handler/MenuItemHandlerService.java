@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 
 @Service
-public class MenuItemServiceHandler {
+public class MenuItemHandlerService {
 
     public MenuItem convertMenuItemRequestToMenuItem(MenuItemRequest menuItemRequest,
                                                      MenuItem menuItem,

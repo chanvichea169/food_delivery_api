@@ -2,18 +2,18 @@ package com.vicheaCoder.food_delivery_api.service.Impl;
 
 import com.vicheaCoder.food_delivery_api.dto.MenuItemRequest;
 import com.vicheaCoder.food_delivery_api.dto.MenuItemResponse;
+import com.vicheaCoder.food_delivery_api.exception.ResourceNotFoundException;
 import com.vicheaCoder.food_delivery_api.model.MenuItem;
 import com.vicheaCoder.food_delivery_api.model.Restaurant;
 import com.vicheaCoder.food_delivery_api.respository.MenuItemRepository;
 import com.vicheaCoder.food_delivery_api.respository.RestaurantRepository;
 import com.vicheaCoder.food_delivery_api.service.MenuItemService;
-import com.vicheaCoder.food_delivery_api.service.handler.MenuItemServiceHandler;
+import com.vicheaCoder.food_delivery_api.service.handler.MenuItemHandlerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -22,53 +22,51 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     private final MenuItemRepository menuItemRepository;
     private final RestaurantRepository restaurantRepository;
-    private final MenuItemServiceHandler menuItemServiceHandler;
+    private final MenuItemHandlerService menuItemHandlerService;
 
     @Override
     public MenuItemResponse createMenuItem(MenuItemRequest menuItemRequest) {
-        Optional<Restaurant> restaurantOpt = restaurantRepository.findById(menuItemRequest.getRestaurantId());
+        Restaurant restaurant = restaurantRepository.findById(menuItemRequest.getRestaurantId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Restaurant not found with id: " + menuItemRequest.getRestaurantId()
+                ));
 
-        if (restaurantOpt.isEmpty()) {
-            log.error("Restaurant with id {} not found", menuItemRequest.getRestaurantId());
-            return new MenuItemResponse();
-        }
-
-        Restaurant restaurant = restaurantOpt.get();
-        MenuItem menuItem = menuItemServiceHandler.convertMenuItemRequestToMenuItem(menuItemRequest, new MenuItem(), restaurant);
+        MenuItem menuItem = menuItemHandlerService.convertMenuItemRequestToMenuItem(
+                menuItemRequest, new MenuItem(), restaurant
+        );
 
         log.info("Creating menu item: {}", menuItem);
         menuItem = menuItemRepository.save(menuItem);
 
-        return menuItemServiceHandler.convertMenuItemToMenuItemResponse(menuItem);
+        return menuItemHandlerService.convertMenuItemToMenuItemResponse(menuItem);
     }
+
 
     @Override
     public MenuItemResponse updateMenuItem(Long id, MenuItemRequest request) {
-        Optional<MenuItem> menuItemOpt = menuItemRepository.findById(id);
-        if (menuItemOpt.isEmpty()) {
-            log.error("Menu item with id {} not found", id);
-            return new MenuItemResponse();
-        }
+        MenuItem existingItem = menuItemRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Menu item not found with id: " + id));
 
-        Optional<Restaurant> restaurantOpt = restaurantRepository.findById(request.getRestaurantId());
-        if (restaurantOpt.isEmpty()) {
-            log.error("Restaurant with id {} not found", request.getRestaurantId());
-            return new MenuItemResponse();
-        }
+        Restaurant restaurant = restaurantRepository.findById(request.getRestaurantId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Restaurant not found with id: " + request.getRestaurantId()
+                ));
 
-        MenuItem updatedItem = menuItemServiceHandler.convertMenuItemRequestToMenuItem(
-                request, menuItemOpt.get(), restaurantOpt.get());
+        MenuItem updatedItem = menuItemHandlerService.convertMenuItemRequestToMenuItem(
+                request, existingItem, restaurant
+        );
 
         log.info("Updating menu item: {}", updatedItem);
         updatedItem = menuItemRepository.save(updatedItem);
 
-        return menuItemServiceHandler.convertMenuItemToMenuItemResponse(updatedItem);
+        return menuItemHandlerService.convertMenuItemToMenuItemResponse(updatedItem);
     }
+
 
     @Override
     public MenuItemResponse getMenuItemById(Long id) {
         return menuItemRepository.findById(id)
-                .map(menuItemServiceHandler::convertMenuItemToMenuItemResponse)
+                .map(menuItemHandlerService::convertMenuItemToMenuItemResponse)
                 .orElseGet(() -> {
                     log.error("Menu item with id {} not found", id);
                     return new MenuItemResponse();
@@ -78,25 +76,22 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Override
     public void deleteMenuItem(Long id) {
         if (!menuItemRepository.existsById(id)) {
-            log.error("Menu item with id {} not found", id);
-            return;
+            throw new ResourceNotFoundException("Menu item not found with id: " + id);
         }
         menuItemRepository.deleteById(id);
         log.info("Menu item with ID: {} deleted successfully", id);
     }
+
     @Override
     public List<MenuItemResponse> getAllMenuItemsByRestaurantId(Long restaurantId) {
-        Optional<Restaurant> restaurantOpt = restaurantRepository.findById(restaurantId);
-        if (restaurantOpt.isEmpty()) {
-            log.error("Restaurant with id {} not found", restaurantId);
-            return List.of();
-        }
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with id: " + restaurantId));
 
-        List<MenuItem> menuItems = menuItemRepository.findAllByRestaurant(restaurantOpt.get());
+        List<MenuItem> menuItems = menuItemRepository.findAllByRestaurant(restaurant);
         log.info("Found {} menu items for restaurant with id {}", menuItems.size(), restaurantId);
 
         return menuItems.stream()
-                .map(menuItemServiceHandler::convertMenuItemToMenuItemResponse)
+                .map(menuItemHandlerService::convertMenuItemToMenuItemResponse)
                 .toList();
     }
 
@@ -106,7 +101,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         log.info("Found {} menu items in total", menuItems.size());
 
         return menuItems.stream()
-                .map(menuItemServiceHandler::convertMenuItemToMenuItemResponse)
+                .map(menuItemHandlerService::convertMenuItemToMenuItemResponse)
                 .toList();
     }
 }
