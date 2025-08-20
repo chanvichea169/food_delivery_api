@@ -12,7 +12,7 @@ import java.util.Date;
 public class MenuItemPhotoHandlerService {
     public String uploadFile(String fileName) {
         // Simulate file upload logic
-        //logic upload file to server or cloud storage write here
+        // upload file to server or cloud storage write here
         return Constant.SUCCESS;
     }
 

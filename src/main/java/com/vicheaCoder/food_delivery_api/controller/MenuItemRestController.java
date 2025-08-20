@@ -35,7 +35,7 @@ public class MenuItemRestController {
         return ResponseEntity.ok(menuItemResponse);
     }
 
-    @PutMapping(value = "/update/{id}", produces = "application/json")
+    @PutMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody MenuItemRequest menuItemRequest, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors());

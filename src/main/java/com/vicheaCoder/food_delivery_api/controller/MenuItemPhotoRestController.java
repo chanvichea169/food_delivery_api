@@ -60,4 +60,13 @@ public class MenuItemPhotoRestController {
             return ResponseEntity.status(404).body("Photo with ID " + id + " not found.");
         }
     }
+
+    @GetMapping(produces = "application/json")
+    public ResponseEntity<?> getAll() {
+        try {
+            return ResponseEntity.ok(menuItemPhotoService.getAll());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(500).body("An error occurred while fetching photos.");
+        }
+    }
 }

@@ -4,7 +4,9 @@ import com.vicheaCoder.food_delivery_api.dto.MenuItemRequest;
 import com.vicheaCoder.food_delivery_api.dto.MenuItemResponse;
 import com.vicheaCoder.food_delivery_api.exception.ResourceNotFoundException;
 import com.vicheaCoder.food_delivery_api.model.MenuItem;
+import com.vicheaCoder.food_delivery_api.model.MenuItemPhoto;
 import com.vicheaCoder.food_delivery_api.model.Restaurant;
+import com.vicheaCoder.food_delivery_api.respository.MenuItemPhotoRepository;
 import com.vicheaCoder.food_delivery_api.respository.MenuItemRepository;
 import com.vicheaCoder.food_delivery_api.respository.RestaurantRepository;
 import com.vicheaCoder.food_delivery_api.service.MenuItemService;
@@ -23,6 +25,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     private final MenuItemRepository menuItemRepository;
     private final RestaurantRepository restaurantRepository;
     private final MenuItemHandlerService menuItemHandlerService;
+    private final MenuItemPhotoRepository menuItemPhotoRepository;
 
     @Override
     public MenuItemResponse createMenuItem(MenuItemRequest menuItemRequest) {
@@ -35,15 +38,26 @@ public class MenuItemServiceImpl implements MenuItemService {
                 menuItemRequest, new MenuItem(), restaurant
         );
 
-        log.info("Creating menu item: {}", menuItem);
-        menuItem = menuItemRepository.save(menuItem);
+        if (menuItemRequest.getMenuItemPhotoRequest() != null && !menuItemRequest.getMenuItemPhotoRequest().isEmpty()) {
+            menuItemRequest.getMenuItemPhotoRequest().forEach(photoReq -> {
+                MenuItemPhoto photo = menuItemHandlerService.convertMenuItemPhotoRequestToEntity(photoReq, menuItem);
+                menuItem.addPhoto(photo);
+            });
+        }
 
-        return menuItemHandlerService.convertMenuItemToMenuItemResponse(menuItem);
+        MenuItem savedItem = menuItemRepository.save(menuItem);
+
+        savedItem.getMenuItemPhotos().forEach(photo -> {
+            MenuItemPhoto save = menuItemPhotoRepository.save(photo);
+        });
+
+        return menuItemHandlerService.convertMenuItemToMenuItemResponse(savedItem);
     }
 
 
     @Override
     public MenuItemResponse updateMenuItem(Long id, MenuItemRequest request) {
+
         MenuItem existingItem = menuItemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Menu item not found with id: " + id));
 
@@ -52,15 +66,26 @@ public class MenuItemServiceImpl implements MenuItemService {
                         "Restaurant not found with id: " + request.getRestaurantId()
                 ));
 
-        MenuItem updatedItem = menuItemHandlerService.convertMenuItemRequestToMenuItem(
-                request, existingItem, restaurant
-        );
+        existingItem.setCode(request.getCode());
+        existingItem.setName(request.getName());
+        existingItem.setDescription(request.getDescription());
+        existingItem.setPrice(request.getPrice());
+        existingItem.setAvailability(request.getAvailability());
+        existingItem.setRestaurant(restaurant);
 
-        log.info("Updating menu item: {}", updatedItem);
-        updatedItem = menuItemRepository.save(updatedItem);
+        existingItem.getMenuItemPhotos().clear();
+        if (request.getMenuItemPhotoRequest() != null && !request.getMenuItemPhotoRequest().isEmpty()) {
+            request.getMenuItemPhotoRequest().forEach(photoReq -> {
+                MenuItemPhoto photo = menuItemHandlerService.convertMenuItemPhotoRequestToEntity(photoReq, existingItem);
+                existingItem.addPhoto(photo);
+            });
+        }
 
-        return menuItemHandlerService.convertMenuItemToMenuItemResponse(updatedItem);
+        MenuItem savedItem = menuItemRepository.save(existingItem);
+
+        return menuItemHandlerService.convertMenuItemToMenuItemResponse(savedItem);
     }
+
 
 
     @Override

@@ -10,4 +10,6 @@ public interface MenuItemPhotoService {
     MenuItemPhotoResponse update(MenuItemPhotoRequest menuItemPhotoRequest, Long id);
     MenuItemPhotoResponse getById(Long id);
     void delete(Long id);
+
+    Object getAll();
 }

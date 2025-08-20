@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -74,5 +76,19 @@ public class MenuItemPhotoServiceImpl implements MenuItemPhotoService {
         menuItemPhotoRepository.delete(menuItemPhoto);
         log.info("MenuItemPhoto deleted successfully with ID: {}", id);
     }
+
+    @Override
+    public List<MenuItemPhotoResponse> getAll() {
+        try {
+            List<MenuItemPhoto> photos = menuItemPhotoRepository.findAll();
+            return photos.stream()
+                    .map(menuItemPhotoHandlerService::convertItemPhotoToItemPhotoResponse)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error fetching all MenuItemPhotos: {}", e.getMessage(), e);
+            throw new RuntimeException("Error fetching all MenuItemPhotos");
+        }
+    }
+
 }
 

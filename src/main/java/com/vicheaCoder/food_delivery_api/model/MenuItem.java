@@ -3,6 +3,9 @@ package com.vicheaCoder.food_delivery_api.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @ToString
@@ -35,7 +38,15 @@ public class MenuItem extends BaseEntity {
     @Column(nullable = false)
     private Integer availability;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
+
+    @OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MenuItemPhoto> menuItemPhotos = new ArrayList<>();
+
+    public void addPhoto(MenuItemPhoto photo) {
+        photo.setMenuItem(this);
+        this.menuItemPhotos.add(photo);
+    }
 }
